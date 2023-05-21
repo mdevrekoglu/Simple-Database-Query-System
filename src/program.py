@@ -23,20 +23,6 @@ def isSTRinFormat(value, format):
         return False
     return True
 
-# Binary search for dict in given list
-def binarySearchDict(list, dict):
-    low = 0
-    high = len(list) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if list[mid] == dict:
-            return mid
-        elif list[mid]['id'] > dict['id']:
-            high = mid - 1
-        else:
-            low = mid + 1
-    return -1
-
 # Binary search for id in given list
 def binarySearchID(list, id):
     low = 0
@@ -111,7 +97,7 @@ def main():
             condition = 0
             if(len(parsed) == 11):
                 condition = 1
-            if(len(parsed) == 15 and (parsed[8] == 'AND' or parsed[8] == 'OR')):
+            elif(len(parsed) == 15 and (parsed[8] == 'AND' or parsed[8] == 'OR')):
                 condition = 2
             else:
                 print('Your format is wrong!')
@@ -185,7 +171,7 @@ def main():
 
                 # Binary search can be used for faster search
                 for row in selected_data[0]:
-                    if (binarySearchDict(selected_data[1], row) != -1):
+                    if (binarySearchID(selected_data[1], row['id']) != -1):
                         merged_data.append(row)
 
             elif(condition == 2 and parsed[8] == 'OR'):
@@ -194,7 +180,7 @@ def main():
                 merged_data = selected_data[0]
 
                 for row in selected_data[1]:
-                    if (binarySearchDict(merged_data, row) == -1):
+                    if (binarySearchID(merged_data, row['id']) == -1):
                         merged_data.append(row)
             elif(condition == 1):
                 merged_data = selected_data[0]
