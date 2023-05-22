@@ -77,7 +77,7 @@ def main():
             user_keys = parsed[1].split(',')
         elif(parsed[0] == 'SELECT' and parsed[1] == 'ALL'):
             user_keys = keys
-        
+
         # SELECT COMMAND
         # EXAMPLE: SELECT ALL FROM STUDENTS WHERE CONDITION
         # EXAMPLE: SELECT {ALL|column_name} FROM STUDENTS WHERE {column_name|=,!=,<,>,<=,>=,!<,!>,AND,OR} ORDER BY{ASC|DSC}
@@ -206,6 +206,7 @@ def main():
             # WriteJson()
             # data_list.sort(key=lambda x: x['id'])
 
+
         # INSERT COMMAND
         # Example: INSERT INTO STUDENTS VALUES(id name surname email grade)
         # Example: INSERT INTO STUDENTS VALUES(1,John,Doe,jhon.doe@gmail.com,20)
@@ -248,7 +249,7 @@ def main():
             
             # If user command is wrong
             if(not flag):
-                writeJson()
+                # writeJson()
                 data_list.sort(key=lambda x: x['id'])
             else:
                 print('Your format is wrong!')
@@ -257,185 +258,122 @@ def main():
         # DELETE COMMAND
         # Example: DELETE FROM STUDENT WHERE CONDITION
         # Example: DELETE FROM STUDENT WHERE {column_name|=,!=,<,>,<=,>=,!<,!>,AND,OR }     
-        # Example: DELETE FROM STUDENT WHERE name = "Fatih"
-        #           0       1   2       3      4  5    6                length = 7
-        elif(userinput.startswith('DELETE FROM STUDENT WHERE')):    #if query starts with delete
-            firstcond_deleted_data = []
-            deleted_data = [[],[]]  #deleted data will be stored in this list
+        # Example: DELETE FROM STUDENT WHERE name = "Fatih"  AND grade > 50
+        #           0       1   2       3      4  5    6      7   8   9  10 
+        elif(userinput.startswith('DELETE FROM STUDENT WHERE')): 
+            # Selected data
+            selected_data = [[],[]]
+
+            # If command is not correct
             flag = False
 
-            delete_condition = 0 #
-            if len(parsed) == 7:  # just 1 condition
-                delete_condition=1
-            elif len(parsed) == 11 and(parsed[7] == 'AND' or parsed[7] == 'OR'):  # if query has contains  condition
-                delete_condition=2
+            # Condition
+            condition = 0
+            if(len(parsed) == 7):
+                condition = 1
+            elif(len(parsed) == 11 and (parsed[7] == 'AND' or parsed[7] == 'OR')):
+                condition = 2
             else:
                 print('Your format is wrong!')
-                print('Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20')
-                print('Example: DELETE FROM STUDENT WHERE name = "Fatih" OR grade <= 20')
-                print('Example: DELETE FROM STUDENT WHERE name = "Fatih"')
+                print('DELETE FROM STUDENT WHERE {column_name|=,!=,<,>,<=,>=,!<,!>,AND,OR }')
                 continue
 
-            if len(parsed) == 7 and delete_condition==1:  # just 1 condition
-                if(parsed[4] == 'name' or parsed[4] == 'lastname' or parsed[4] == 'email'):
-                    parsed[6] = parsed[6].translate( { ord('"'): None } )
+            for i in range(0, condition):
+                # Example: DELETE FROM STUDENT WHERE name = "Fatih"  AND grade > 50
+                #           0       1   2       3      4  5    6      7   8   9  10 
 
-                    if(parsed[5] == '='):
-                        for row in data_list:
-                            if row[parsed[4]] == parsed[6]:
-                                firstcond_deleted_data.append(row)
-
-                    elif(parsed[5] == '!='):
-                        for row in data_list:
-                            if row[parsed[4]] != parsed[6]:
-                                firstcond_deleted_data.append(row)
-
+                # If cond is name or lastname
+                if(parsed[4 + (i * 4)] == 'name' or parsed[4 + (i * 4)] == 'lastname' or parsed[4 + (i * 4)] == 'email'):
+                    
+                    if(isSTRinFormat(parsed[6 + (i * 4)], 1)):
+                        parsed[6 + (i * 4)] = parsed[6 + (i * 4)][1:-1]
                     else:
                         flag = True
-                        print('Your format is wrong!')
-                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20')
-                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih" OR grade <= 20')
-                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih"')
+                        break
 
-
-                elif(parsed[4] == 'id' or parsed[4] == 'grade'):
-                    if(parsed[5] == '='):
+                    if(parsed[5 + (i * 4)] == '='):
                         for row in data_list:
-                            if row[parsed[4]] == int(parsed[6]):
-                                firstcond_deleted_data.append(row)
-
-                    elif(parsed[5] == '!='):
+                            if row[parsed[4 + (i * 4)]] == parsed[6 + (i * 4)]:
+                                selected_data[i].append(row)
+                    elif(parsed[5 + (i * 4)] == '!='):
                         for row in data_list:
-                            if row[parsed[4]] != int(parsed[6]):
-                                firstcond_deleted_data.append(row)
-                    # !< and !>
-                    elif(parsed[5] == '<'):
-                        for row in data_list:
-                            if row[parsed[4]] < int(parsed[6]):
-                                firstcond_deleted_data.append(row)
-
-                    elif(parsed[5] == '>'):
-                        for row in data_list:
-                            if row[parsed[4]] > int(parsed[6]):
-                                firstcond_deleted_data.append(row)
-
-                    elif(parsed[5] == '<=' or parsed[5] == '!>'):
-                        for row in data_list:
-                            if row[parsed[4]] <= int(parsed[6]):
-                                firstcond_deleted_data.append(row)
-                    
-                    elif(parsed[5] == '>=' or parsed[5] == '!<'):
-                        for row in data_list:
-                            if row[parsed[4]] >= int(parsed[6]):
-                                firstcond_deleted_data.append(row)
-                    
+                            if row[parsed[4 + (i * 4)]] != parsed[6 + (i * 4)]:
+                                selected_data[i].append(row)
                     else:
                         flag = True
-                        print('Your format is wrong!')
-                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20')
-                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih" OR grade <= 20')
-                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih"')                  
-
-            # Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20
-            #           0       1   2       3      4  5    6    7    8    9 10 length = 11         
-            elif(len(parsed)==11 and (parsed[7] == 'AND' or parsed[7] == 'OR')):#if query contains AND or OR
-                
-                for i in range(0, delete_condition):
-                     # If condition is name or lastname or email
-                    if(parsed[4 + (i * 4)] == 'name' or parsed[4 + (i * 4)] == 'lastname' or parsed[4 + (i * 4)] == 'email'):# If condition is name or lastname or email
-                        parsed[6 + (i * 4)] = parsed[6 + (i * 4)].translate( { ord('"'): None } ) # remove " from string
-                        if(parsed[5+(i*4)]=='='):
-                            for row in data_list:
-                                if row[parsed[4+(i*4)]]==parsed[6+(i*4)]:
-                                    deleted_data[i].append(row)
-                        elif(parsed[5+(i*4)]=='!='):
-                            for row in data_list:
-                                if row[parsed[4+(i*4)]]!=parsed[6+(i*4)]:
-                                    deleted_data[i].append(row)
-                        else:
-                            flag = True
-                            print('Your format is wrong!')
-                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20')
-                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih" OR grade <= 20')
-                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih"')
-                            break
+                        break
                     
-                                    
-                    # If condition is id or grade
-                    elif(parsed[4 + (i * 4)] == 'id' or parsed[4 + (i * 4)] == 'grade'):# If condition is id or grade
-                        if(parsed[5 + (i * 4)] == '='):
-                            for row in data_list:
-                                if row[parsed[4 + (i * 4)]] == int(parsed[6 + (i * 4)]):
-                                    deleted_data[i].append(row)
-                                    
-                        elif(parsed[5 + (i * 4)] == '!='):
-                            for row in data_list:
-                                if row[parsed[4 + (i * 4)]] != int(parsed[6 + (i * 4)]):
-                                    deleted_data[i].append(row)
-                                    
-                        elif(parsed[5 + (i * 4)] == '<'):
-                            for row in data_list:
-                                if row[parsed[4 + (i * 4)]] < int(parsed[6 + (i * 4)]):
-                                    deleted_data[i].append(row)
-                                    
-                        elif(parsed[5 + (i * 4)] == '>'):
-                            for row in data_list:
-                                if row[parsed[4 + (i * 4)]] > int(parsed[6 + (i * 4)]):
-                                    deleted_data[i].append(row)
-                                    
-                                    
-                        elif(parsed[5 + (i * 4)] == '<=' or parsed[5 + (i * 4)] == '!>'):
-                            for row in data_list:
-                                if row[parsed[4 + (i * 4)]] <= int(parsed[6 + (i * 4)]):
-                                    deleted_data[i].append(row)
-                                    
-                                    
-                        elif(parsed[5 + (i * 4)] == '>=' or parsed[5 + (i * 4)] == '!<'):
-                            for row in data_list:
-                                if row[parsed[4 + (i * 4)]] >= int(parsed[6 + (i * 4)]):
-                                    deleted_data[i].append(row)
-                        
-                        else:
-                            flag = True
-                            print('Your format is wrong!')
-                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20')
-                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih" OR grade <= 20')
-                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih"')
-                            break
-                                    
+                # If cond is id or grade
+                # Operations = ['=','!=','<','>','<=','>=','!<','!>','AND','OR']
+                elif(parsed[4 + (i * 4)] == 'id' or parsed[4 + (i * 4)] == 'grade'):
+
+                    if(parsed[5 + (i * 4)] == '='):
+                        for row in data_list:
+                            if row[parsed[4 + (i * 4)]] == int(parsed[6 + (i * 4)]):
+                                selected_data[i].append(row)
+                    elif(parsed[5 + (i * 4)] == '!='):
+                        for row in data_list:
+                            if row[parsed[4 + (i * 4)]] != int(parsed[6 + (i * 4)]):
+                                selected_data[i].append(row)
+                    elif(parsed[5 + (i * 4)] == '<'):
+                        for row in data_list:
+                            if row[parsed[4 + (i * 4)]] < int(parsed[6 + (i * 4)]):
+                                selected_data[i].append(row)
+                    elif(parsed[5 + (i * 4)] == '>'):
+                        for row in data_list:
+                            if row[parsed[4 + (i * 4)]] > int(parsed[6 + (i * 4)]):
+                                selected_data[i].append(row)
+                    elif(parsed[5 + (i * 4)] == '<=' or parsed[5 + (i * 4)] == '!>'):
+                        for row in data_list:
+                            if row[parsed[4 + (i * 4)]] <= int(parsed[6 + (i * 4)]):
+                                selected_data[i].append(row)
+                    elif(parsed[5 + (i * 4)] == '>=' or parsed[5 + (i * 4)] == '!<'):
+                        for row in data_list:
+                            if row[parsed[4 + (i * 4)]] >= int(parsed[6 + (i * 4)]):
+                                selected_data[i].append(row)
                     else:
-                        print("Wrong command! or Your format is wrong!")
-                        continue
-                
-                if(flag):
-                    continue
-                
-                merged_deleted_data =[]
-                if(parsed[7]=='AND'):   #merging deleted data
-                    for row in deleted_data[0]:
-                        if (binarySearchID(deleted_data[1], row['id']) != -1):  #binary search for faster 
-                            merged_deleted_data.append(row)
-                elif(parsed[7]=='OR'):  #adding the list of the data to be deleted
-                    merged_deleted_data = deleted_data[0] + deleted_data[1]
+                        flag = True
+                        break
 
+            # If command is not correct  
+            if(flag):
+                print('Your format is wrong!')
+                print('SELECT {ALL|column_name} FROM STUDENTS WHERE {column_name|=,!=,<,>,<=,>=,!<,!>,AND,OR} ORDER BY{ASC|DSC}')
+                continue
 
-                for row in data_list:   #removing merged deleted data from data_list
-                    if (binarySearchID(merged_deleted_data, row['id']) != -1): #binary search for faster 
-                        print("Deleted data is:")
-                        print(row)
-                        data_list.remove(row)
-                        flag=True
-                writeJson()     #writing the data_list end of the loop
-                if flag==False:
-                    print("There is no such a data")
-                    break
-            if(len(parsed)==7):
-                for row in data_list:
-                    if row in firstcond_deleted_data: 
-                        print("Deleted data is:")
-                        print(row)
-                        data_list.remove(row)
-            writeJson() #writing the data_list end of the loop
+            merged_data = []
+
+            if(condition == 2 and parsed[7] == 'AND'):
+
+                # Binary search can be used for faster search
+                for row in selected_data[0]:
+                    if (binarySearchID(selected_data[1], row['id']) != -1):
+                        merged_data.append(row)
+            elif(condition == 2 and parsed[7] == 'OR'):
+
+                # Add two lists and remove duplicates from list (by using set, tuple)
+                merged_data = selected_data[0]
+                for row in selected_data[1]:
+                    if (binarySearchID(merged_data, row['id']) == -1):
+                        merged_data.append(row)
+            elif(condition == 1):
+                merged_data = selected_data[0]
+       
+            merged_data.sort(key=lambda x: x['id'])
+
+            # Print selected data
+            for row in merged_data:
+                print('Deleted data: ', row)
+                data_list.pop(binarySearchID(data_list, row['id']))
+
+            # Write selected data to json file if wanted
+            # WriteJson(merged_data)
+
+            # We did not want to change the original data_list so we did not write the selected data to json file
+            # if we want to change the original data_list we can write the selected data to json file
+            # data_list = merged_data
+            # WriteJson()
+            # data_list.sort(key=lambda x: x['id'])
                    
         # EXIT COMMAND
         elif(userinput=="exit"):
