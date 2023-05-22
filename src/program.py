@@ -262,6 +262,7 @@ def main():
         elif(userinput.startswith('DELETE FROM STUDENT WHERE')):    #if query starts with delete
             firstcond_deleted_data = []
             deleted_data = [[],[]]  #deleted data will be stored in this list
+            flag = False
 
             delete_condition = 0 #
             if len(parsed) == 7:  # just 1 condition
@@ -278,9 +279,24 @@ def main():
             if len(parsed) == 7 and delete_condition==1:  # just 1 condition
                 if(parsed[4] == 'name' or parsed[4] == 'lastname' or parsed[4] == 'email'):
                     parsed[6] = parsed[6].translate( { ord('"'): None } )
-                    for row in data_list:
-                        if row[parsed[4]] == parsed[6]:
-                            firstcond_deleted_data.append(row)
+
+                    if(parsed[5] == '='):
+                        for row in data_list:
+                            if row[parsed[4]] == parsed[6]:
+                                firstcond_deleted_data.append(row)
+
+                    elif(parsed[5] == '!='):
+                        for row in data_list:
+                            if row[parsed[4]] != parsed[6]:
+                                firstcond_deleted_data.append(row)
+
+                    else:
+                        flag = True
+                        print('Your format is wrong!')
+                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20')
+                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih" OR grade <= 20')
+                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih"')
+
 
                 elif(parsed[4] == 'id' or parsed[4] == 'grade'):
                     if(parsed[5] == '='):
@@ -292,7 +308,7 @@ def main():
                         for row in data_list:
                             if row[parsed[4]] != int(parsed[6]):
                                 firstcond_deleted_data.append(row)
-
+                    # !< and !>
                     elif(parsed[5] == '<'):
                         for row in data_list:
                             if row[parsed[4]] < int(parsed[6]):
@@ -303,11 +319,23 @@ def main():
                             if row[parsed[4]] > int(parsed[6]):
                                 firstcond_deleted_data.append(row)
 
-                    elif(parsed[5] == '<='):
+                    elif(parsed[5] == '<=' or parsed[5] == '!>'):
                         for row in data_list:
                             if row[parsed[4]] <= int(parsed[6]):
                                 firstcond_deleted_data.append(row)
-       
+                    
+                    elif(parsed[5] == '>=' or parsed[5] == '!<'):
+                        for row in data_list:
+                            if row[parsed[4]] >= int(parsed[6]):
+                                firstcond_deleted_data.append(row)
+                    
+                    else:
+                        flag = True
+                        print('Your format is wrong!')
+                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20')
+                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih" OR grade <= 20')
+                        print('Example: DELETE FROM STUDENT WHERE name = "Fatih"')                  
+
             # Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20
             #           0       1   2       3      4  5    6    7    8    9 10 length = 11         
             elif(len(parsed)==11 and (parsed[7] == 'AND' or parsed[7] == 'OR')):#if query contains AND or OR
@@ -320,6 +348,18 @@ def main():
                             for row in data_list:
                                 if row[parsed[4+(i*4)]]==parsed[6+(i*4)]:
                                     deleted_data[i].append(row)
+                        elif(parsed[5+(i*4)]=='!='):
+                            for row in data_list:
+                                if row[parsed[4+(i*4)]]!=parsed[6+(i*4)]:
+                                    deleted_data[i].append(row)
+                        else:
+                            flag = True
+                            print('Your format is wrong!')
+                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20')
+                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih" OR grade <= 20')
+                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih"')
+                            break
+                    
                                     
                     # If condition is id or grade
                     elif(parsed[4 + (i * 4)] == 'id' or parsed[4 + (i * 4)] == 'grade'):# If condition is id or grade
@@ -354,11 +394,22 @@ def main():
                             for row in data_list:
                                 if row[parsed[4 + (i * 4)]] >= int(parsed[6 + (i * 4)]):
                                     deleted_data[i].append(row)
+                        
+                        else:
+                            flag = True
+                            print('Your format is wrong!')
+                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20')
+                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih" OR grade <= 20')
+                            print('Example: DELETE FROM STUDENT WHERE name = "Fatih"')
+                            break
                                     
                     else:
                         print("Wrong command! or Your format is wrong!")
                         continue
-
+                
+                if(flag):
+                    continue
+                
                 merged_deleted_data =[]
                 if(parsed[7]=='AND'):   #merging deleted data
                     for row in deleted_data[0]:
@@ -366,7 +417,8 @@ def main():
                             merged_deleted_data.append(row)
                 elif(parsed[7]=='OR'):  #adding the list of the data to be deleted
                     merged_deleted_data = deleted_data[0] + deleted_data[1]
-                flag=False 
+
+
                 for row in data_list:   #removing merged deleted data from data_list
                     if (binarySearchID(merged_deleted_data, row['id']) != -1): #binary search for faster 
                         print("Deleted data is:")
