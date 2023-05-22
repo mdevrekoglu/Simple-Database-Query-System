@@ -131,6 +131,12 @@ def main():
                 # Operations = ['=','!=','<','>','<=','>=','!<','!>','AND','OR']
                 elif(parsed[5 + (i * 4)] == 'id' or parsed[5 + (i * 4)] == 'grade'):
 
+                    try:
+                        parsed[7 + (i * 4)] = int(parsed[7 + (i * 4)])
+                    except:
+                        flag = True
+                        break
+
                     if(parsed[6 + (i * 4)] == '='):
                         for row in data_list:
                             if row[parsed[5 + (i * 4)]] == int(parsed[7 + (i * 4)]):
@@ -300,6 +306,12 @@ def main():
                 # If cond is id or grade
                 # Operations = ['=','!=','<','>','<=','>=','!<','!>','AND','OR']
                 elif(parsed[4 + (i * 4)] == 'id' or parsed[4 + (i * 4)] == 'grade'):
+
+                    try:
+                        parsed[6 + (i * 4)] = int(parsed[6 + (i * 4)])
+                    except:
+                        flag = True
+                        break
 
                     if(parsed[5 + (i * 4)] == '='):
                         for row in data_list:
