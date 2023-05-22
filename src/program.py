@@ -357,7 +357,6 @@ def main():
                         merged_data.append(row)
             elif(condition == 2 and parsed[7] == 'OR'):
 
-                # Add two lists and remove duplicates from list (by using set, tuple)
                 merged_data = selected_data[0]
                 for row in selected_data[1]:
                     if (binarySearchID(merged_data, row['id']) == -1):
@@ -372,11 +371,6 @@ def main():
                 print('Deleted data: ', row)
                 data_list.pop(binarySearchID(data_list, row['id']))
 
-            # We did not want to change the original data_list so we did not write the selected data to json file
-            # If we want to change the original data_list we can write the selected data to json file
-            # data_list = merged_data
-            # WriteJson()
-            # data_list.sort(key=lambda x: x['id'])
                    
         # EXIT COMMAND
         elif(userinput=="exit"):
