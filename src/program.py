@@ -197,9 +197,6 @@ def main():
                     print(row[key], end=' ')
                 print()
 
-            # Write selected data to json file if wanted
-            # WriteJson(merged_data)
-
             # We did not want to change the original data_list so we did not write the selected data to json file
             # if we want to change the original data_list we can write the selected data to json file
             # data_list = merged_data
@@ -259,7 +256,6 @@ def main():
         # Example: DELETE FROM STUDENT WHERE CONDITION
         # Example: DELETE FROM STUDENT WHERE {column_name|=,!=,<,>,<=,>=,!<,!>,AND,OR }     
         # Example: DELETE FROM STUDENT WHERE name = "Fatih"  AND grade > 50
-        #           0       1   2       3      4  5    6      7   8   9  10 
         elif(userinput.startswith('DELETE FROM STUDENT WHERE')): 
             # Selected data
             selected_data = [[],[]]
@@ -279,8 +275,6 @@ def main():
                 continue
 
             for i in range(0, condition):
-                # Example: DELETE FROM STUDENT WHERE name = "Fatih"  AND grade > 50
-                #           0       1   2       3      4  5    6      7   8   9  10 
 
                 # If cond is name or lastname
                 if(parsed[4 + (i * 4)] == 'name' or parsed[4 + (i * 4)] == 'lastname' or parsed[4 + (i * 4)] == 'email'):
@@ -338,7 +332,7 @@ def main():
             # If command is not correct  
             if(flag):
                 print('Your format is wrong!')
-                print('SELECT {ALL|column_name} FROM STUDENTS WHERE {column_name|=,!=,<,>,<=,>=,!<,!>,AND,OR} ORDER BY{ASC|DSC}')
+                print('DELETE FROM STUDENT WHERE {column_name|=,!=,<,>,<=,>=,!<,!>,AND,OR }')
                 continue
 
             merged_data = []
@@ -366,11 +360,8 @@ def main():
                 print('Deleted data: ', row)
                 data_list.pop(binarySearchID(data_list, row['id']))
 
-            # Write selected data to json file if wanted
-            # WriteJson(merged_data)
-
             # We did not want to change the original data_list so we did not write the selected data to json file
-            # if we want to change the original data_list we can write the selected data to json file
+            # If we want to change the original data_list we can write the selected data to json file
             # data_list = merged_data
             # WriteJson()
             # data_list.sort(key=lambda x: x['id'])
