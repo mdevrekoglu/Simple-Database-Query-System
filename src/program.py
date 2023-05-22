@@ -259,17 +259,20 @@ def main():
         # Example: DELETE FROM STUDENT WHERE {column_name|=,!=,<,>,<=,>=,!<,!>,AND,OR }     
         # Example: DELETE FROM STUDENT WHERE name = "Fatih"
         #           0       1   2       3      4  5    6                length = 7
-        elif(userinput.startswith('DELETE FROM STUDENT WHERE')):
+        elif(userinput.startswith('DELETE FROM STUDENT WHERE')):    #if query starts with delete
             firstcond_deleted_data = []
-            deleted_data = [[],[]]
+            deleted_data = [[],[]]  #deleted data will be stored in this list
 
-            delete_condition = 0
+            delete_condition = 0 #
             if len(parsed) == 7:  # just 1 condition
                 delete_condition=1
-            elif len(parsed) == 11 and(parsed[7] == 'AND' or parsed[7] == 'OR'):  # 2 condition
+            elif len(parsed) == 11 and(parsed[7] == 'AND' or parsed[7] == 'OR'):  # if query has contains  condition
                 delete_condition=2
             else:
                 print('Your format is wrong!')
+                print('Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20')
+                print('Example: DELETE FROM STUDENT WHERE name = "Fatih" OR grade <= 20')
+                print('Example: DELETE FROM STUDENT WHERE name = "Fatih"')
                 continue
 
             if len(parsed) == 7 and delete_condition==1:  # just 1 condition
@@ -307,19 +310,19 @@ def main():
        
             # Example: DELETE FROM STUDENT WHERE name = "Fatih" AND grade = 20
             #           0       1   2       3      4  5    6    7    8    9 10 length = 11         
-            elif(len(parsed)==11 and (parsed[7] == 'AND' or parsed[7] == 'OR')):
+            elif(len(parsed)==11 and (parsed[7] == 'AND' or parsed[7] == 'OR')):#if query contains AND or OR
                 
                 for i in range(0, delete_condition):
                      # If condition is name or lastname or email
-                    if(parsed[4 + (i * 4)] == 'name' or parsed[4 + (i * 4)] == 'lastname' or parsed[4 + (i * 4)] == 'email'):
-                        parsed[6 + (i * 4)] = parsed[6 + (i * 4)].translate( { ord('"'): None } )
+                    if(parsed[4 + (i * 4)] == 'name' or parsed[4 + (i * 4)] == 'lastname' or parsed[4 + (i * 4)] == 'email'):# If condition is name or lastname or email
+                        parsed[6 + (i * 4)] = parsed[6 + (i * 4)].translate( { ord('"'): None } ) # remove " from string
                         if(parsed[5+(i*4)]=='='):
                             for row in data_list:
                                 if row[parsed[4+(i*4)]]==parsed[6+(i*4)]:
                                     deleted_data[i].append(row)
                                     
                     # If condition is id or grade
-                    elif(parsed[4 + (i * 4)] == 'id' or parsed[4 + (i * 4)] == 'grade'):
+                    elif(parsed[4 + (i * 4)] == 'id' or parsed[4 + (i * 4)] == 'grade'):# If condition is id or grade
                         if(parsed[5 + (i * 4)] == '='):
                             for row in data_list:
                                 if row[parsed[4 + (i * 4)]] == int(parsed[6 + (i * 4)]):
@@ -357,30 +360,30 @@ def main():
                         continue
 
                 merged_deleted_data =[]
-                if(parsed[7]=='AND'):#merging deleted data
+                if(parsed[7]=='AND'):   #merging deleted data
                     for row in deleted_data[0]:
-                        if row in deleted_data[1]:
+                        if (binarySearchID(deleted_data[1], row['id']) != -1):  #binary search for faster 
                             merged_deleted_data.append(row)
-                elif(parsed[7]=='OR'):#adding the list of the data to be deleted
+                elif(parsed[7]=='OR'):  #adding the list of the data to be deleted
                     merged_deleted_data = deleted_data[0] + deleted_data[1]
                 flag=False 
-                for row in data_list:#removing merged deleted data from data_list
-                    if row in merged_deleted_data:
+                for row in data_list:   #removing merged deleted data from data_list
+                    if (binarySearchID(merged_deleted_data, row['id']) != -1): #binary search for faster 
                         print("Deleted data is:")
                         print(row)
                         data_list.remove(row)
                         flag=True
-                        writeJson()
-                    if flag==False:
-                        print("There is no such a data")
-                        break
+                writeJson()     #writing the data_list end of the loop
+                if flag==False:
+                    print("There is no such a data")
+                    break
             if(len(parsed)==7):
                 for row in data_list:
                     if row in firstcond_deleted_data: 
                         print("Deleted data is:")
                         print(row)
                         data_list.remove(row)
-                        writeJson()
+            writeJson() #writing the data_list end of the loop
                    
         # EXIT COMMAND
         elif(userinput=="exit"):
@@ -390,6 +393,7 @@ def main():
         # WRONG COMMAND
         else:
             print("Wrong command!")
+            
 
 main()
 
